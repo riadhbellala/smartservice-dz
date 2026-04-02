@@ -242,3 +242,75 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// ============================================================
+// SUBMIT REVIEW
+// PUT /api/bookings/:id/review
+// Protected
+// ============================================================
+export const submitReview = async (req: AuthRequest, res: Response) => {
+  const userId = req.user!.id;
+  const { id } = req.params;
+  const { rating, review } = req.body;
+
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be between 1 and 5" });
+  }
+
+  try {
+    const appointmentResult = await pool.query(
+      `SELECT * FROM appointments WHERE id = $1 AND user_id = $2`,
+      [id, userId]
+    );
+
+    if (appointmentResult.rows.length === 0) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const appointment = appointmentResult.rows[0];
+
+    if (appointment.status !== "COMPLETED") {
+      return res.status(400).json({ message: "Can only review completed appointments" });
+    }
+
+    if (appointment.rating !== null) {
+      return res.status(400).json({ message: "Already reviewed" });
+    }
+
+    await pool.query("BEGIN");
+
+    await pool.query(
+      `UPDATE appointments SET rating = $1, review = $2, updated_at = NOW() WHERE id = $3`,
+      [rating, review || null, id]
+    );
+
+    const serviceResult = await pool.query(
+      `SELECT provider_id FROM services WHERE id = $1`,
+      [appointment.service_id]
+    );
+    const providerId = serviceResult.rows[0].provider_id;
+
+    const avgQuery = await pool.query(`
+      SELECT AVG(rating) as avg_rating, COUNT(*) as total_reviews
+      FROM appointments
+      WHERE service_id IN (
+        SELECT id FROM services WHERE provider_id = $1
+      ) AND rating IS NOT NULL
+    `, [providerId]);
+    
+    const { avg_rating, total_reviews } = avgQuery.rows[0];
+
+    await pool.query(
+      `UPDATE provider_profiles SET avg_rating = $1, total_reviews = $2, updated_at = NOW() WHERE id = $3`,
+      [parseFloat(avg_rating).toFixed(2), parseInt(total_reviews), providerId]
+    );
+
+    await pool.query("COMMIT");
+
+    return res.status(200).json({ message: "Review submitted successfully" });
+  } catch (error) {
+    await pool.query("ROLLBACK");
+    console.error("submitReview error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
