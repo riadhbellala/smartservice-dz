@@ -88,7 +88,7 @@ const ProviderDetail = () => {
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         {/* Provider Header */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm mb-6 flex gap-6 items-start">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm mb-6 flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start text-center sm:text-left">
           <div className="w-20 h-20 bg-slate-100 border border-slate-200 rounded-2xl flex items-center justify-center flex-shrink-0">
              <span className="material-symbols-outlined text-4xl text-slate-400">store</span>
           </div>
@@ -202,10 +202,13 @@ const ProviderDetail = () => {
              <Button 
                variant="primary" 
                size="lg" 
-               fullWidth
+               className="w-full sm:w-auto flex-1 sm:flex-none"
                disabled={!selectedSlotId || !selectedServiceId || bookingLoading}
                onClick={handleBook}
              >
+               <span className="sm:hidden mr-2">
+                 {selectedServiceId ? (provider.services?.find((s:any) => s.id === selectedServiceId)?.price || 0) : 0} DZD •
+               </span>
                {bookingLoading ? "Booking..." : "Confirm Booking"}
              </Button>
            </div>

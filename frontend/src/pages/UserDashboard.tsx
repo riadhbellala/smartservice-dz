@@ -82,7 +82,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col items-center sm:items-start text-center sm:text-left">
             <p className="text-sm font-bold text-slate-500 mb-1">Total</p>
             <p className="text-2xl font-extrabold text-slate-900">{bookings.length}</p>
@@ -98,7 +98,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-slate-200 w-full">
+        <div className="flex gap-2 mb-6 border-b border-slate-200 w-full overflow-x-auto scrollbar-hide whitespace-nowrap">
           {(['UPCOMING', 'PAST', 'CANCELLED'] as const).map((tab) => (
             <button
               key={tab}

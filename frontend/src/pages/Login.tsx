@@ -41,171 +41,141 @@ export const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background font-sans flex">
-
-      {/* LEFT SIDE — Branding Panel */}
-      <div className="hidden lg:flex w-1/2 bg-primary flex-col justify-between p-12 relative overflow-hidden">
-
-       {/* Background decorative circles */}
-<div className="absolute -top-20 -right-20 w-80 h-80 bg-white/5 rounded-full" />
-<div className="absolute -bottom-16 -left-16 w-64 h-64 bg-white/5 rounded-full" />
-<div className="absolute top-1/2 -right-10 w-48 h-48 bg-white/5 rounded-full" />
-        {/* Logo */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="material-symbols-outlined text-white text-2xl">
-              auto_awesome
-            </span>
-          </div>
-          <h1 className="text-white text-xl font-extrabold tracking-tight">
-            SmartService <span className="opacity-70">DZ</span>
-          </h1>
-        </div>
-
-        {/* Center content */}
-        <div className="relative z-10">
-          <h2 className="text-white text-4xl font-extrabold leading-tight mb-6">
-            Book smarter.<br />
-            Wait less.<br />
-            <span className="opacity-70">Live better.</span>
-          </h2>
-          <p className="text-blue-200 text-base leading-relaxed max-w-sm">
-            Algeria's first AI-powered appointment platform.
-            No more queues, no more wasted days.
-          </p>
-
-          {/* Stats row */}
-          <div className="mt-10 grid grid-cols-3 gap-4">
-            {[
-              { value: "50K+", label: "Users" },
-              { value: "1.2K", label: "Providers" },
-              { value: "98%", label: "Satisfaction" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white/10 rounded-2xl p-4 text-center">
-                <p className="text-white text-2xl font-extrabold">{stat.value}</p>
-                <p className="text-blue-200 text-xs font-medium mt-1">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom quote */}
-        <p className="text-blue-300 text-xs relative z-10">
-          © 2026 SmartService DZ. All rights reserved.
-        </p>
+    <div className="min-h-screen bg-slate-50 font-sans flex items-center justify-center p-4 sm:p-8 relative overflow-hidden">
+      
+      {/* Background Orbs */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 blur-3xl rounded-full" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-400/20 blur-3xl rounded-full" />
       </div>
 
-      {/* RIGHT SIDE — Login Form */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl flex flex-col lg:flex-row overflow-hidden relative z-10 border border-slate-100">
+        
+        {/* BRANDING PANEL (Visible on Mobile & Desktop) */}
+        <div className="w-full lg:w-5/12 bg-primary p-8 sm:p-12 relative flex flex-col justify-between overflow-hidden">
+          {/* Glass circles */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 blur-2xl rounded-full" />
+          <div className="absolute bottom-10 -left-20 w-48 h-48 bg-white/10 blur-2xl rounded-full" />
 
-          {/* Mobile logo */}
-          <div className="flex items-center gap-3 mb-8 lg:hidden">
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center">
-              <span className="material-symbols-outlined text-white">auto_awesome</span>
+          {/* Top Logo */}
+          <div className="flex items-center gap-3 relative z-10 mb-8 sm:mb-12">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-white text-2xl">auto_awesome</span>
             </div>
-            <h1 className="text-xl font-extrabold text-textDark">
-              SmartService <span className="text-primary">DZ</span>
+            <h1 className="text-white text-xl font-extrabold tracking-tight">
+              SmartService <span className="opacity-70">DZ</span>
             </h1>
           </div>
 
-          {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-slate-900">
-              Welcome back 👋
+          <div className="relative z-10 flex-1 flex flex-col justify-center">
+            <h2 className="text-white text-3xl sm:text-4xl font-extrabold leading-tight mb-4 sm:mb-6">
+              Book smarter.<br />
+              Wait less.<br />
+              <span className="text-blue-200">Live better.</span>
             </h2>
-            <p className="text-slate-500 mt-2 font-medium">
-              Sign in to manage your appointments
+            <p className="text-blue-100/80 text-sm sm:text-base leading-relaxed max-w-sm hidden sm:block">
+              Algeria's first AI-powered appointment platform. No more queues, no more wasted days.
             </p>
           </div>
-
-          {/* Error alert */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
-              <span className="material-symbols-outlined text-red-500 text-xl">
-                error
-              </span>
-              <p className="text-red-600 text-sm font-medium">{error}</p>
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              label="Email Address"
-              type="email"
-              placeholder="ahmed@gmail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              icon="mail"
-            />
-
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              icon="lock"
-            />
-
-            {/* Forgot password */}
-            <div className="flex justify-end">
-              <a href="#" className="text-sm font-bold text-primary hover:underline">
-                Forgot password?
-              </a>
-            </div>
-
-            <Button
-              type="submit"
-              fullWidth
-              size="lg"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-xl">
-                    progress_activity
-                  </span>
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  Sign In
-                  <span className="material-symbols-outlined text-xl">
-                    arrow_forward
-                  </span>
-                </>
-              )}
-            </Button>
-          </form>
-
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-slate-400 text-sm font-medium">or</span>
-            <div className="flex-1 h-px bg-slate-200" />
+          
+          <div className="relative z-10 hidden sm:block mt-12">
+             <div className="flex -space-x-3">
+               <div className="w-10 h-10 rounded-full border-2 border-primary bg-blue-300"></div>
+               <div className="w-10 h-10 rounded-full border-2 border-primary bg-blue-400"></div>
+               <div className="w-10 h-10 rounded-full border-2 border-primary bg-blue-500"></div>
+               <div className="w-10 h-10 rounded-full border-2 border-primary bg-white flex items-center justify-center">
+                 <span className="text-xs font-bold text-primary">+50k</span>
+               </div>
+             </div>
+             <p className="text-blue-200 text-xs mt-3 font-medium">Join thousands of happy users today.</p>
           </div>
-
-          {/* Register link */}
-          <p className="text-center text-slate-600 font-medium">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="text-primary font-bold hover:underline"
-            >
-              Create one free
-            </Link>
-          </p>
-
-          {/* Provider signup note */}
-          <p className="text-center text-slate-400 text-xs mt-4">
-            Are you a clinic or office?{" "}
-            <Link to="/register?role=PROVIDER" className="text-primary font-semibold">
-              Register as Provider →
-            </Link>
-          </p>
         </div>
+
+        {/* LOGIN FORM */}
+        <div className="w-full lg:w-7/12 p-8 sm:p-12 lg:p-16 flex items-center justify-center bg-white">
+          <div className="w-full max-w-md">
+            <div className="mb-8">
+              <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                Welcome back 👋
+              </h2>
+              <p className="text-slate-500 mt-2 font-medium">
+                Sign in to manage your appointments
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50/50 border border-red-100 rounded-2xl flex items-center gap-3">
+                <span className="material-symbols-outlined text-red-500 text-xl">error</span>
+                <p className="text-red-700 text-sm font-medium">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+              <Input
+                label="Email Address"
+                type="email"
+                placeholder="ahmed@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                icon="mail"
+              />
+              <Input
+                label="Password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                icon="lock"
+              />
+
+              <div className="flex justify-end">
+                <a href="#" className="text-sm font-bold text-primary hover:text-blue-700 transition">
+                  Forgot password?
+                </a>
+              </div>
+
+              <Button
+                type="submit"
+                fullWidth
+                size="lg"
+                disabled={loading}
+                className="shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all mt-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-xl mr-2">progress_activity</span>
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign In
+                    <span className="material-symbols-outlined text-xl ml-2 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="my-8 flex items-center gap-4">
+              <div className="flex-1 h-px bg-slate-100" />
+              <span className="text-slate-400 text-sm font-medium">or</span>
+              <div className="flex-1 h-px bg-slate-100" />
+            </div>
+
+            <p className="text-center text-slate-600 font-medium">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-primary font-bold hover:underline">
+                Create one free
+              </Link>
+            </p>
+            <p className="text-center text-slate-400 text-xs mt-4">
+              Are you a clinic or office?{" "}
+              <Link to="/register?role=PROVIDER" className="text-primary font-semibold hover:text-primary/80 transition cursor-pointer">
+                Register as Provider →
+              </Link>
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   );

@@ -87,16 +87,16 @@ const Home = () => {
             </Button>
           </div>
           
-          <div className="flex items-center justify-center lg:justify-start gap-8 border-t border-slate-200 pt-8 mt-12">
-            <div className="text-center lg:text-left">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-8 border-t border-slate-200 pt-8 mt-12">
+            <div className="text-center lg:text-left w-1/3 sm:w-auto">
               <h4 className="text-2xl font-extrabold text-slate-900">50K+</h4>
               <p className="text-sm font-medium text-slate-500">Users</p>
             </div>
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left w-1/3 sm:w-auto">
               <h4 className="text-2xl font-extrabold text-slate-900">1,200+</h4>
               <p className="text-sm font-medium text-slate-500">Providers</p>
             </div>
-            <div className="text-center lg:text-left">
+            <div className="text-center lg:text-left w-1/3 sm:w-auto">
               <h4 className="text-2xl font-extrabold text-slate-900">70%</h4>
               <p className="text-sm font-medium text-slate-500">Less Waiting</p>
             </div>

@@ -8,7 +8,7 @@ import axios from "axios";
 // In development it's localhost:3000
 // In production it will be our deployed URL
 const API = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
 });
 
 // Interceptor — runs before EVERY request
