@@ -1,6 +1,3 @@
-// authStore.ts — global authentication state using Zustand
-// Zustand is simpler than Redux — just a function that returns state + actions
-// Any component can read from or update this store
 import { create } from "zustand";
 import type { User } from "../types";
 
@@ -12,34 +9,84 @@ interface AuthState {
   logout: () => void;
 }
 
-// Helper — safely reads user object from localStorage
-// We use try/catch because JSON.parse can throw if data is corrupted
+// ── Helpers ──────────────────────────────────────────────
+
 const getSavedUser = (): User | null => {
   try {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
+    // Try localStorage first
+    const fromLocal = localStorage.getItem("user");
+    if (fromLocal) return JSON.parse(fromLocal);
+
+    // Fallback: try sessionStorage
+    const fromSession = sessionStorage.getItem("user");
+    if (fromSession) return JSON.parse(fromSession);
+
+    return null;
   } catch {
     return null;
   }
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  // Now user is restored from localStorage on every page load
-  user: getSavedUser(),
-  token: localStorage.getItem("token"),
-  isAuthenticated: !!localStorage.getItem("token"),
+const getSavedToken = (): string | null => {
+  try {
+    // Try localStorage first
+    const fromLocal = localStorage.getItem("token");
+    if (fromLocal) return fromLocal;
 
-  // login — saves BOTH token and user to localStorage
+    // Fallback: try sessionStorage
+    const fromSession = sessionStorage.getItem("token");
+    if (fromSession) return fromSession;
+
+    // Fallback: try cookie
+    const match = document.cookie.match(/(?:^|;\s*)token=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveToStorage = (key: string, value: string) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {}
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {}
+  // Also save token as cookie (works in Safari)
+  if (key === "token") {
+    document.cookie = `token=${encodeURIComponent(value)};path=/;max-age=604800;SameSite=Lax`;
+  }
+};
+
+const clearStorage = () => {
+  try {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  } catch {}
+  try {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+  } catch {}
+  // Clear cookie
+  document.cookie = "token=;path=/;max-age=0";
+};
+
+// ── Store ─────────────────────────────────────────────────
+
+export const useAuthStore = create<AuthState>((set) => ({
+  user: getSavedUser(),
+  token: getSavedToken(),
+  isAuthenticated: !!getSavedToken(),
+
   login: (user, token) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    // Save to all storage types for maximum compatibility
+    saveToStorage("token", token);
+    saveToStorage("user", JSON.stringify(user));
     set({ user, token, isAuthenticated: true });
   },
 
-  // logout — clears BOTH token and user from localStorage
   logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearStorage();
     set({ user: null, token: null, isAuthenticated: false });
   },
 }));
