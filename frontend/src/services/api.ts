@@ -62,3 +62,13 @@ export const getMyBookings = () => API.get("/bookings/my");
 
 export const cancelBooking = (id: string) =>
   API.put(`/bookings/${id}/cancel`);
+
+// NOTIFICATIONS
+export const getNotifications = () =>
+  API.get("/notifications");
+
+export const markNotificationRead = (id: string) =>
+  API.put(`/notifications/${id}/read`);
+
+export const markAllNotificationsRead = () =>
+  API.put("/notifications/read-all");

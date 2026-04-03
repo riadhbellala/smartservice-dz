@@ -48,10 +48,10 @@ const getSavedToken = (): string | null => {
 const saveToStorage = (key: string, value: string) => {
   try {
     localStorage.setItem(key, value);
-  } catch {}
+  } catch (err) { void err; }
   try {
     sessionStorage.setItem(key, value);
-  } catch {}
+  } catch (err) { void err; }
   // Also save token as cookie (works in Safari)
   if (key === "token") {
     document.cookie = `token=${encodeURIComponent(value)};path=/;max-age=604800;SameSite=Lax`;
@@ -62,11 +62,11 @@ const clearStorage = () => {
   try {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-  } catch {}
+  } catch (err) { void err; }
   try {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("user");
-  } catch {}
+  } catch (err) { void err; }
   // Clear cookie
   document.cookie = "token=;path=/;max-age=0";
 };
