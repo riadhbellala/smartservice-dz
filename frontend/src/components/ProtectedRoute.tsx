@@ -32,8 +32,22 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   }
 
   if (allowedRoles && allowedRoles.length > 0) {
-    if (!user || !allowedRoles.includes(user.role)) {
-      return <Navigate to="/dashboard" replace />;
+    const userRole = user?.role?.toUpperCase() || "";
+    const isAllowed = allowedRoles.some(r => r.toUpperCase() === userRole);
+    
+    if (!user || !isAllowed) {
+      // Redirect to their actual role's home page to prevent infinite redirect loops
+      if (userRole === "PROVIDER" && location.pathname !== "/provider") {
+        return <Navigate to="/provider" replace />;
+      }
+      if (userRole === "ADMIN" && location.pathname !== "/admin") {
+        return <Navigate to="/admin" replace />;
+      }
+      if (userRole === "USER" && location.pathname !== "/dashboard") {
+        return <Navigate to="/dashboard" replace />;
+      }
+      // Fallback if they are already on their dashboard but somehow not allowed (?) or unknown role:
+      return <Navigate to="/" replace />;
     }
   }
 

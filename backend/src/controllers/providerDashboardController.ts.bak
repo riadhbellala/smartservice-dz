@@ -19,10 +19,9 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
       return res.status(200).json({ data: createRes.rows[0] });
     }
     return res.status(200).json({ data: result.rows[0] });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -76,11 +75,10 @@ export const updateMyProfile = async (req: AuthRequest, res: Response) => {
 
     await pool.query("COMMIT");
     return res.status(200).json({ message: "Profile updated", data: profileResult.rows[0] });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     await pool.query("ROLLBACK");
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -102,10 +100,9 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
       ORDER BY ts.start_time DESC
     `, [req.user?.id]);
     return res.status(200).json({ data: result.rows });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -153,11 +150,10 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
 
     await pool.query("COMMIT");
     return res.status(200).json({ message: "Status updated", data: result.rows[0] });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     await pool.query("ROLLBACK");
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -172,10 +168,9 @@ export const getMySlots = async (req: AuthRequest, res: Response) => {
       ORDER BY start_time ASC
     `, [req.user?.id]);
     return res.status(200).json({ data: result.rows });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -210,10 +205,9 @@ export const createSlot = async (req: AuthRequest, res: Response) => {
     `, [providerId, startTime, endTime]);
 
     return res.status(201).json({ message: "Slot created", data: result.rows[0] });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -269,10 +263,9 @@ export const createBulkSlots = async (req: AuthRequest, res: Response) => {
     }
 
     return res.status(201).json({ message: "Bulk slots processed", data: { created, skipped, slots } });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -295,10 +288,9 @@ export const deleteSlot = async (req: AuthRequest, res: Response) => {
 
     await pool.query(`DELETE FROM time_slots WHERE id = $1`, [slotId]);
     return res.status(200).json({ message: "Slot deleted" });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -313,10 +305,9 @@ export const getMyServices = async (req: AuthRequest, res: Response) => {
       ORDER BY name ASC
     `, [req.user?.id]);
     return res.status(200).json({ data: result.rows });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -336,10 +327,9 @@ export const createService = async (req: AuthRequest, res: Response) => {
     `, [providerId, name, description || null, duration, price || 0]);
 
     return res.status(201).json({ message: "Service created", data: result.rows[0] });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -377,10 +367,9 @@ export const updateService = async (req: AuthRequest, res: Response) => {
     }
     
     return res.status(400).json({ message: "No fields provided to update" });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -408,10 +397,9 @@ export const deleteService = async (req: AuthRequest, res: Response) => {
 
     await pool.query(`DELETE FROM services WHERE id = $1`, [serviceId]);
     return res.status(200).json({ message: "Service deleted" });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -482,10 +470,9 @@ export const getMyAnalytics = async (req: AuthRequest, res: Response) => {
         topServices: q4.rows
       }
     });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -549,10 +536,9 @@ export const getPeakHours = async (req: AuthRequest, res: Response) => {
         busiestDay
       }
     });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -658,9 +644,8 @@ export const getAISuggestions = async (req: AuthRequest, res: Response) => {
     }
 
     return res.status(200).json({ data: { suggestions, generatedAt: new Date() } });
-  } catch (error: any) {
-    require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error", error: String(error) });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

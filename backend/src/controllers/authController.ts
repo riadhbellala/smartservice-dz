@@ -70,6 +70,15 @@ export const register = async (req: Request, res: Response) => {
 
     const newUser = result.rows[0];
 
+    // Auto-create a provider profile if the role is PROVIDER
+    if (userRole === "PROVIDER") {
+      await pool.query(
+        `INSERT INTO provider_profiles (user_id, business_name, description, created_at, updated_at)
+         VALUES ($1, $2, $3, NOW(), NOW())`,
+        [newUser.id, `${newUser.first_name} ${newUser.last_name}`, ""]
+      );
+    }
+
     // Create JWT token
     // jwt.sign(payload, secret, options)
     // payload = data to store inside the token

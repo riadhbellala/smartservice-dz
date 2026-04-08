@@ -72,3 +72,22 @@ export const markNotificationRead = (id: string) =>
 
 export const markAllNotificationsRead = () =>
   API.put("/notifications/read-all");
+
+// DASHBOARD / PROVIDER SPECIFIC APIs
+export const getProviderProfile = () => API.get("/provider/profile");
+export const updateProviderProfile = (data: any) => API.put("/provider/profile", data);
+export const getProviderBookings = () => API.get("/provider/bookings");
+export const updateBookingStatus = (id: string, status: string) => API.put(`/provider/bookings/${id}`, { status });
+export const getProviderOwnSlots = (date?: string) => API.get("/provider/slots", { params: { date } });
+export const createSlot = (data: { startTime: string; endTime: string }) => API.post("/provider/slots", data);
+export const createBulkSlots = (data: any) => API.post("/provider/slots/bulk", data);
+export const deleteSlot = (id: string) => API.delete(`/provider/slots/${id}`);
+export const getProviderOwnServices = () => API.get("/provider/services");
+export const createService = (data: any) => API.post("/provider/services", data);
+export const updateService = (id: string, data: any) => API.put(`/provider/services/${id}`, data);
+export const deleteService = (id: string) => API.delete(`/provider/services/${id}`);
+export const getProviderAnalytics = () => API.get("/provider/analytics");
+export const getPeakHours = () => API.get("/provider/ai/peak-hours");
+export const getAISuggestions = () => API.get("/provider/ai/suggestions");
+
+export default API;
