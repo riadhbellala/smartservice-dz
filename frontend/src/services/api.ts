@@ -90,4 +90,14 @@ export const getProviderAnalytics = () => API.get("/provider/analytics");
 export const getPeakHours = () => API.get("/provider/ai/peak-hours");
 export const getAISuggestions = () => API.get("/provider/ai/suggestions");
 
+// ADMIN APIs
+export const getPlatformStats = () => API.get("/admin/stats");
+export const getAllUsers = (params?: { search?: string; role?: string; status?: string; page?: number }) => API.get("/admin/users", { params });
+export const updateUserStatus = (id: string, status: string) => API.put(`/admin/users/${id}/status`, { status });
+export const getAllProviders = (params?: { status?: string }) => API.get("/admin/providers", { params });
+export const verifyProvider = (id: string) => API.put(`/admin/providers/${id}/verify`);
+export const suspendProvider = (id: string) => API.put(`/admin/providers/${id}/suspend`);
+export const getAllBookings = (params?: { page?: number; limit?: number }) => API.get("/admin/bookings", { params });
+export const getPlatformAnalytics = () => API.get("/admin/analytics");
+
 export default API;

@@ -13,8 +13,12 @@ import ProviderServices from "./pages/provider/ProviderServices";
 import ProviderAnalytics from "./pages/provider/ProviderAnalytics";
 import ProviderAIInsights from "./pages/provider/ProviderAIInsights";
 import ProviderSettings from "./pages/provider/ProviderSettings";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminProviders from "./pages/admin/AdminProviders";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 
-const AdminDashboard = () => <div className="min-h-screen bg-background flex justify-center items-center"><div className="bg-white p-8 rounded-2xl shadow border text-center"><h2 className="text-2xl font-bold">Admin Dashboard</h2></div></div>;
+
 const BookingPage = () => <div className="min-h-screen bg-background flex justify-center items-center"><div className="bg-white p-8 rounded-2xl shadow border text-center"><h2 className="text-2xl font-bold">Booking Details (In Progress)</h2></div></div>;
 
 function App() {
@@ -94,10 +98,25 @@ function App() {
       } />
       
 
-      
+      {/* Admin Routes */}
       <Route path="/admin" element={
         <ProtectedRoute allowedRoles={["ADMIN"]}>
           <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/users" element={
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <AdminUsers />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/providers" element={
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <AdminProviders />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin/analytics" element={
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <AdminAnalytics />
         </ProtectedRoute>
       } />
 

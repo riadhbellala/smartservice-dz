@@ -127,7 +127,7 @@ export const getAllProviders = async (req: AuthRequest, res: Response) => {
     }
 
     const query = `
-      SELECT pp.*, u.first_name, u.last_name, u.email, u.is_active
+      SELECT pp.*, u.first_name, u.last_name, u.email, u.phone, u.is_active
       FROM provider_profiles pp 
       JOIN users u ON pp.user_id = u.id
       ${whereClause}
