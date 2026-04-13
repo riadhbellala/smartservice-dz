@@ -23,7 +23,7 @@ const Providers = () => {
     setError('');
     try {
       const res = await getProviders({ search, city, category });
-      setProviders(Array.isArray(res.data) ? res.data : []);
+      setProviders(Array.isArray(res.data?.providers) ? res.data.providers : (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
       setError('Failed to load providers. Please try again.');
@@ -139,7 +139,7 @@ const Providers = () => {
               <div key={p.id} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="font-extrabold text-lg text-slate-900 mb-1 line-clamp-1">{p.businessName || `${p.user?.firstName} ${p.user?.lastName}`}</h3>
+                    <h3 className="font-extrabold text-lg text-slate-900 mb-1 line-clamp-1">{p.business_name || `${p.first_name} ${p.last_name}`}</h3>
                     <div className="flex gap-2 items-center">
                       <span className="inline-block px-2.5 py-1 bg-blue-50 text-primary text-xs font-bold rounded-lg border border-blue-100 flex-shrink-0">
                         {p.category}
@@ -156,12 +156,12 @@ const Providers = () => {
                   <div className="flex text-accent">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <span key={i} className="material-symbols-outlined text-[18px]">
-                        {i < Math.floor(p.rating || 4) ? 'star' : 'star_border'}
+                        {i < Math.floor(p.avg_rating || 4) ? 'star' : 'star_border'}
                       </span>
                     ))}
                   </div>
                   <span className="text-xs font-bold text-slate-600 pl-1 border-l border-slate-200">
-                    {p.rating || "4.5"} Rating
+                    {p.avg_rating || "4.5"} Rating
                   </span>
                 </div>
                 

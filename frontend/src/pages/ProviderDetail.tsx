@@ -22,7 +22,7 @@ const ProviderDetail = () => {
     const fetchProvider = async () => {
       try {
         const res = await getProviderById(id);
-        const data = res.data;
+        const data = res.data?.provider || res.data;
         setProvider(data);
         if (data?.services?.length > 0) {
           setSelectedServiceId(data.services[0].id);
@@ -40,7 +40,7 @@ const ProviderDetail = () => {
       try {
         const dateStr = selectedDate.toISOString().split('T')[0];
         const res = await getProviderSlots(id, dateStr);
-        setSlots(Array.isArray(res.data) ? res.data : []);
+        setSlots(Array.isArray(res.data?.slots) ? res.data.slots : []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -93,7 +93,7 @@ const ProviderDetail = () => {
              <span className="material-symbols-outlined text-4xl text-slate-400">store</span>
           </div>
           <div>
-             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{provider.businessName || "Provider Profile"}</h2>
+             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">{provider.business_name || provider.first_name || "Provider Profile"}</h2>
              <span className="inline-block px-3 py-1 bg-blue-50 text-primary text-xs font-bold rounded-lg border border-blue-100 mb-2">
                 {provider.category || 'Service'}
              </span>
@@ -103,7 +103,7 @@ const ProviderDetail = () => {
              </p>
              <div className="flex items-center gap-1 text-accent mt-2">
                 <span className="material-symbols-outlined text-[18px]">star</span>
-                <span className="text-sm font-bold text-slate-700">{provider.rating || '4.5'}</span>
+                <span className="text-sm font-bold text-slate-700">{provider.avg_rating || '4.5'}</span>
              </div>
           </div>
         </div>
@@ -168,9 +168,9 @@ const ProviderDetail = () => {
              </div>
            ) : (
              slots.map((slot) => {
-               const time = new Date(slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+               const time = new Date(slot.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                const isSelected = selectedSlotId === slot.id;
-               const isAvailable = !slot.isBooked; // or status === 'AVAILABLE'
+               const isAvailable = slot.status === 'AVAILABLE';
 
                return (
                  <button

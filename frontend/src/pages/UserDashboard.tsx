@@ -17,7 +17,7 @@ const UserDashboard = () => {
     setLoading(true);
     try {
       const res = await getMyBookings();
-      setBookings(Array.isArray(res.data) ? res.data : []);
+      setBookings(Array.isArray(res.data?.appointments) ? res.data.appointments : (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
     } finally {
@@ -49,13 +49,13 @@ const UserDashboard = () => {
   const now = new Date();
   
   const filteredBookings = bookings.filter((b) => {
-    if (!b.timeSlot?.startTime && !b.date) return false;
-    const slotTime = new Date(b.timeSlot?.startTime || b.date);
+    if (!b.start_time) return false;
+    const slotTime = new Date(b.start_time);
     if (activeTab === 'CANCELLED') return b.status === 'CANCELLED';
     if (activeTab === 'PAST') return b.status === 'COMPLETED' || (slotTime < now && b.status !== 'CANCELLED');
     if (activeTab === 'UPCOMING') return (b.status === 'PENDING' || b.status === 'CONFIRMED') && slotTime >= now;
     return true;
-  }).sort((a, b) => new Date(a.timeSlot?.startTime || a.date).getTime() - new Date(b.timeSlot?.startTime || b.date).getTime());
+  }).sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
   const upcomingCount = bookings.filter((b) => b.status === 'PENDING' || b.status === 'CONFIRMED').length;
   const cancelledCount = bookings.filter((b) => b.status === 'CANCELLED').length;
@@ -129,7 +129,7 @@ const UserDashboard = () => {
              </div>
           ) : (
             filteredBookings.map((b) => {
-              const date = new Date(b.timeSlot?.startTime || b.date);
+              const date = new Date(b.start_time);
               
               let statusColor = "bg-slate-100 text-slate-600 border-slate-200";
               if (b.status === 'CONFIRMED') statusColor = "bg-green-50 text-secondary border-green-100";
@@ -144,8 +144,8 @@ const UserDashboard = () => {
                        <span className="text-lg font-extrabold leading-none">{date.getDate()}</span>
                     </div>
                     <div>
-                      <h3 className="font-extrabold text-slate-900">{b.provider?.businessName || "Provider"}</h3>
-                      <p className="text-sm font-medium text-slate-500 mb-2">{b.service?.name || "Service Appointment"}</p>
+                      <h3 className="font-extrabold text-slate-900">{b.provider_name || "Provider"}</h3>
+                      <p className="text-sm font-medium text-slate-500 mb-2">{b.service_name || "Service Appointment"}</p>
                       <div className="flex gap-2 items-center flex-wrap">
                         <span className="text-xs font-bold bg-slate-100 px-2 py-1 rounded-md text-slate-700 flex items-center gap-1">
                           <span className="material-symbols-outlined text-[14px]">schedule</span>

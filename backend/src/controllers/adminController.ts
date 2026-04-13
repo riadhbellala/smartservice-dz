@@ -1,6 +1,7 @@
 import { Response } from "express";
 import pool from "../db";
 import { AuthRequest } from "../types";
+import { createNotification } from "./notificationController";
 
 export const getPlatformStats = async (req: AuthRequest, res: Response) => {
   try {
@@ -106,6 +107,17 @@ export const updateUserStatus = async (req: AuthRequest, res: Response) => {
 
     if (result.rows.length === 0) return res.status(404).json({ message: "User not found" });
 
+    try {
+      await createNotification(
+        userId, 
+        "SYSTEM", 
+        "Account Status Updated", 
+        `Your account has been ${isActive ? 'activated' : 'deactivated'} by the administrator.`
+      );
+    } catch (err) {
+      console.error("Notification failed", err);
+    }
+
     return res.status(200).json({ message: "User status updated", data: result.rows[0] });
   } catch (error) {
     console.error(error);
@@ -162,6 +174,18 @@ export const verifyProvider = async (req: AuthRequest, res: Response) => {
     await pool.query(`UPDATE users SET is_active = true WHERE id = $1`, [userId]);
 
     await pool.query("COMMIT");
+
+    try {
+      await createNotification(
+        userId, 
+        "SYSTEM", 
+        "Profile Verified", 
+        "Congratulations! Your provider profile has been verified and is now live."
+      );
+    } catch (err) {
+      console.error("Notification failed", err);
+    }
+
     return res.status(200).json({ message: "Provider verified", data: result.rows[0] });
   } catch (error) {
     await pool.query("ROLLBACK");
@@ -190,6 +214,18 @@ export const suspendProvider = async (req: AuthRequest, res: Response) => {
     await pool.query(`UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1`, [userId]);
 
     await pool.query("COMMIT");
+
+    try {
+      await createNotification(
+        userId, 
+        "SYSTEM", 
+        "Profile Suspended", 
+        "Your provider account has been suspended by the administrator."
+      );
+    } catch (err) {
+      console.error("Notification failed", err);
+    }
+
     return res.status(200).json({ message: "Provider suspended", data: result.rows[0] });
   } catch (error) {
     await pool.query("ROLLBACK");

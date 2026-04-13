@@ -1,6 +1,7 @@
 import { Response } from "express";
 import pool from "../db";
 import { AuthRequest } from "../types";
+import { createNotification } from "./notificationController";
 
 // getMyProfile
 export const getMyProfile = async (req: AuthRequest, res: Response) => {
@@ -116,7 +117,7 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
     const { status } = req.body; 
 
     const apptCheck = await pool.query(`
-      SELECT a.id, a.status, a.time_slot_id
+      SELECT a.id, a.status, a.time_slot_id, a.user_id
       FROM appointments a
       JOIN time_slots ts ON a.time_slot_id = ts.id
       JOIN provider_profiles pp ON ts.provider_id = pp.id
@@ -152,6 +153,18 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
     }
 
     await pool.query("COMMIT");
+
+    try {
+      await createNotification(
+        apptCheck.rows[0].user_id,
+        "BOOKING_UPDATE",
+        "Appointment Update",
+        `Your appointment status has been updated to ${status}.`
+      );
+    } catch (err) {
+      console.error("Failed to send notification:", err);
+    }
+
     return res.status(200).json({ message: "Status updated", data: result.rows[0] });
   } catch (error: any) {
     require('fs').writeFileSync('/tmp/backend_err.txt', 'Payload: ' + JSON.stringify(req.body) + '\nError: ' + String(error.message));

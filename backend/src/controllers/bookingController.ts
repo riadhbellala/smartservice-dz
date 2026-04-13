@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import pool from "../db";
 import { AuthRequest } from "../types";
+import { createNotification } from "./notificationController";
 
 // ============================================================
 // BOOK AN APPOINTMENT
@@ -114,6 +115,23 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
         appointment: appointmentResult.rows[0],
       });
 
+      try {
+        const providerUserResult = await pool.query(
+            `SELECT user_id FROM provider_profiles WHERE id = $1`,
+            [slot.provider_id]
+        );
+        if (providerUserResult.rows.length > 0) {
+            await createNotification(
+                providerUserResult.rows[0].user_id,
+                "BOOKING_NEW",
+                "New Appointment Request",
+                `You have a new appointment request for ${serviceResult.rows[0].name}.`
+            );
+        }
+      } catch (err) {
+        console.error("Failed to send notification:", err);
+      }
+
     } catch (innerError) {
       // Something went wrong — rollback BOTH changes
       await pool.query("ROLLBACK");
@@ -180,7 +198,7 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
   try {
     // Find the appointment — make sure it belongs to this user
     const appointmentResult = await pool.query(
-      `SELECT a.*, ts.start_time FROM appointments a
+      `SELECT a.*, ts.start_time, ts.provider_id FROM appointments a
        JOIN time_slots ts ON a.time_slot_id = ts.id
        WHERE a.id = $1 AND a.user_id = $2`,
       [id, userId]
@@ -231,6 +249,23 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
       await pool.query("COMMIT");
 
       res.json({ message: "Appointment cancelled successfully" });
+
+      try {
+        const providerUserResult = await pool.query(
+            `SELECT user_id FROM provider_profiles WHERE id = $1`,
+            [appointment.provider_id]
+        );
+        if (providerUserResult.rows.length > 0) {
+            await createNotification(
+                providerUserResult.rows[0].user_id,
+                "BOOKING_CANCELLED",
+                "Appointment Cancelled",
+                `An appointment on ${new Date(appointment.start_time).toLocaleDateString()} has been cancelled by the customer.`
+            );
+        }
+      } catch (err) {
+        console.error("Failed to send notification:", err);
+      }
 
     } catch (innerError) {
       await pool.query("ROLLBACK");
