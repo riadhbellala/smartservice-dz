@@ -2,16 +2,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { getMyBookings, cancelBooking } from '../services/api';
+import { getMyBookings, cancelBooking, submitReview } from '../services/api';
 import { Button } from '../components/ui/Button';
+import { useToast } from '../context/ToastContext';
+import NotificationBell from '../components/NotificationBell';
 
 const UserDashboard = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'UPCOMING' | 'PAST' | 'CANCELLED'>('UPCOMING');
+
+  const [cancelModal, setCancelModal] = useState<{ open: boolean; bookingId: string | null }>({ open: false, bookingId: null });
+  const [ratingModal, setRatingModal] = useState<{ open: boolean; bookingId: string | null }>({ open: false, bookingId: null });
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -29,15 +38,42 @@ const UserDashboard = () => {
     fetchBookings();
   }, []);
 
-  const handleCancel = async (id: string) => {
-    if (window.confirm('Are you sure you want to cancel this appointment?')) {
-      try {
-        await cancelBooking(id);
-        fetchBookings();
-      } catch (err) {
-        console.error(err);
-        alert('Failed to cancel. It may be too late to cancel online.');
-      }
+  const handleCancel = (id: string) => {
+    setCancelModal({ open: true, bookingId: id });
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelModal.bookingId) return;
+    try {
+      await cancelBooking(cancelModal.bookingId);
+      showToast("Appointment cancelled", "success");
+      fetchBookings();
+      setCancelModal({ open: false, bookingId: null });
+    } catch (err) {
+      console.error(err);
+      showToast("Cannot cancel. Less than 1 hour away.", "error");
+      setCancelModal({ open: false, bookingId: null });
+    }
+  };
+
+  const handleSubmitRating = async () => {
+    if (!ratingModal.bookingId) return;
+    setSubmittingRating(true);
+    try {
+      await submitReview(ratingModal.bookingId, {
+        rating: selectedRating,
+        review: reviewText
+      });
+      showToast("Review submitted! Thank you 🌟", "success");
+      setRatingModal({ open: false, bookingId: null });
+      setSelectedRating(0);
+      setReviewText("");
+      fetchBookings();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to submit review", "error");
+    } finally {
+      setSubmittingRating(false);
     }
   };
 
@@ -67,10 +103,13 @@ const UserDashboard = () => {
           <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
           <span className="font-extrabold text-lg text-slate-800 hidden sm:block">SmartService DZ</span>
         </div>
-        <Button variant="outline" size="sm" onClick={handleLogout}>
-          <span className="material-symbols-outlined text-[18px]">logout</span>
-          Logout
-        </Button>
+        <div className="flex items-center gap-4">
+          <NotificationBell />
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            <span className="material-symbols-outlined text-[18px]">logout</span>
+            Logout
+          </Button>
+        </div>
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -165,12 +204,105 @@ const UserDashboard = () => {
                        </Button>
                      </div>
                   )}
+
+                  {b.status === 'COMPLETED' && (
+                     <div className="mt-2 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-slate-100 flex-shrink-0">
+                       {b.rating ? (
+                         <div className="flex flex-col items-center sm:items-end">
+                           <span className="text-xs font-bold text-slate-500 mb-1">Your rating:</span>
+                           <div className="flex text-accent">
+                             {Array.from({ length: 5 }).map((_, i) => (
+                               <span key={i} className={`material-symbols-outlined text-[16px] ${i < b.rating ? "text-accent" : "text-slate-300"}`}>
+                                 {i < b.rating ? "star" : "star_border"}
+                               </span>
+                             ))}
+                           </div>
+                         </div>
+                       ) : (
+                         <Button variant="outline" size="sm" onClick={() => setRatingModal({ open: true, bookingId: b.id })} fullWidth>
+                           <span className="material-symbols-outlined text-[18px]">star</span>
+                           Rate this appointment
+                         </Button>
+                       )}
+                     </div>
+                  )}
                 </div>
               );
             })
           )}
         </div>
       </div>
+
+      {/* Cancel Modal */}
+      {cancelModal.open && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-xl">
+            <span className="material-symbols-outlined text-red-500 text-5xl mb-2">cancel</span>
+            <h3 className="text-xl font-extrabold text-slate-900 mb-2">Cancel Appointment?</h3>
+            <p className="text-slate-500 mb-6 font-medium">This action cannot be undone.</p>
+            <div className="flex flex-col gap-3">
+              <Button variant="danger" onClick={confirmCancel} fullWidth>
+                Yes, Cancel
+              </Button>
+              <Button variant="outline" onClick={() => setCancelModal({ open: false, bookingId: null })} fullWidth>
+                Keep It
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rating Modal */}
+      {ratingModal.open && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-xl text-center">
+            <h3 className="text-xl font-extrabold text-slate-900 mb-1">Rate Your Appointment ⭐</h3>
+            <p className="text-slate-500 mb-6 text-sm font-medium">How was your experience?</p>
+            
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span 
+                  key={star}
+                  className={`material-symbols-outlined text-4xl cursor-pointer transition-all hover:scale-110 ${star <= selectedRating ? 'text-accent' : 'text-slate-300'}`}
+                  onClick={() => setSelectedRating(star)}
+                >
+                  {star <= selectedRating ? 'star' : 'star_border'}
+                </span>
+              ))}
+            </div>
+
+            <textarea
+              placeholder="Share your experience (optional)..."
+              rows={3}
+              className="w-full border border-slate-200 rounded-xl p-3 text-sm resize-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none mb-6 font-medium text-slate-700 placeholder:text-slate-400"
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+            />
+
+            <div className="flex flex-col gap-3">
+              <Button 
+                variant="primary" 
+                onClick={handleSubmitRating} 
+                disabled={selectedRating === 0 || submittingRating} 
+                fullWidth
+              >
+                {submittingRating ? "Submitting..." : "Submit Review"}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setRatingModal({ open: false, bookingId: null });
+                  setSelectedRating(0);
+                  setReviewText("");
+                }} 
+                fullWidth
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

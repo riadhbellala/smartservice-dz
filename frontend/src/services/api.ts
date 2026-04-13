@@ -63,6 +63,9 @@ export const getMyBookings = () => API.get("/bookings/my");
 export const cancelBooking = (id: string) =>
   API.put(`/bookings/${id}/cancel`);
 
+export const submitReview = (id: string, data: { rating: number; review?: string }) =>
+  API.put(`/bookings/${id}/review`, data);
+
 // NOTIFICATIONS
 export const getNotifications = () =>
   API.get("/notifications");

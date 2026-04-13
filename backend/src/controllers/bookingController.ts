@@ -158,6 +158,8 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
         a.id,
         a.status,
         a.notes,
+        a.rating,
+        a.review,
         a.created_at,
         s.name AS service_name,
         s.duration AS service_duration,
