@@ -21,11 +21,10 @@ const Home = () => {
       <nav className="sticky top-0 z-50 bg-white border-b border-slate-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-              <span className="material-symbols-outlined text-primary text-3xl">auto_awesome</span>
-              <span className="font-extrabold text-xl">
-                <span className="text-primary">SmartService</span>
-                <span className="text-secondary ml-1">DZ</span>
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+              <img src="/ssd.png" alt="SmartService DZ" className="h-10 w-auto" />
+              <span className="font-extrabold text-xl tracking-tight text-slate-800 hidden sm:block">
+                SmartService<span className="text-primary ml-1">DZ</span>
               </span>
             </div>
             
@@ -208,9 +207,9 @@ const Home = () => {
       <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-col items-center md:items-start gap-2">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
-              <span className="font-extrabold text-white text-lg">SmartService DZ</span>
+            <div className="flex items-center gap-3 mb-2">
+              <img src="/ssd.png" alt="SmartService DZ" className="h-10 w-auto" />
+              <span className="font-extrabold text-white text-xl tracking-tight">SmartService DZ</span>
             </div>
             <p className="text-sm text-slate-400">Algeria's smarter way to book.</p>
           </div>

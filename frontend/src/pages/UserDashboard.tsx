@@ -99,9 +99,11 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <nav className="bg-white border-b border-slate-100 py-4 px-6 flex justify-between items-center sticky top-0 z-10">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-          <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
-          <span className="font-extrabold text-lg text-slate-800 hidden sm:block">SmartService DZ</span>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+          <img src="/ssd.png" alt="SmartService DZ" className="h-10 w-auto" />
+          <span className="font-extrabold text-xl tracking-tight text-slate-800 hidden sm:block">
+            SmartService<span className="text-primary ml-1">DZ</span>
+          </span>
         </div>
         <div className="flex items-center gap-4">
           <NotificationBell />

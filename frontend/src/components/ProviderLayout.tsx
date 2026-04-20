@@ -52,10 +52,8 @@ export const ProviderLayout = ({ children, title }: ProviderLayoutProps) => {
       >
         <div>
           {/* Logo */}
-          <div className="h-16 flex items-center px-6 border-b border-slate-100">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3 shrink-0 text-white shadow-sm">
-              <span className="material-symbols-outlined text-xl">auto_awesome</span>
-            </div>
+          <div className="h-16 flex items-center px-6 border-b border-slate-100 gap-3">
+            <img src="/ssd.png" alt="SmartService DZ" className="h-10 w-auto" />
             <h1 className="text-xl font-extrabold text-slate-900 tracking-tight truncate">
               SmartService <span className="text-primary truncate">DZ</span>
             </h1>

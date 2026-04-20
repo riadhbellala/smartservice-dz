@@ -46,8 +46,8 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
     const role = req.query.role as string;
     const isActive = req.query.isActive as string;
 
-    let whereClauses = [];
-    let values = [];
+    const whereClauses: string[] = [];
+    const values: any[] = [];
     let i = 1;
 
     if (search) {
@@ -59,15 +59,20 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       whereClauses.push(`role = $${i++}`);
       values.push(role);
     }
-    if (isActive !== undefined) {
+    if (isActive !== undefined && isActive !== '') {
       whereClauses.push(`is_active = $${i++}`);
       values.push(isActive === 'true');
     }
 
-    const whereString = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : "";
+    const whereString = whereClauses.length > 0
+      ? `WHERE ${whereClauses.join(" AND ")}`
+      : "";
     const offset = (page - 1) * 20;
 
-    const countQuery = await pool.query(`SELECT COUNT(*) FROM users ${whereString}`, values);
+    const countQuery = await pool.query(
+      `SELECT COUNT(*) FROM users ${whereString}`,
+      values
+    );
     const totalCount = parseInt(countQuery.rows[0].count);
 
     const usersQuery = await pool.query(`
@@ -93,7 +98,8 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
 
 export const updateUserStatus = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.params.id;
+    // ✅ Fixed: added "as string"
+    const userId = req.params.id as string;
     const { isActive } = req.body;
 
     if (req.user?.id === userId) {
@@ -105,20 +111,25 @@ export const updateUserStatus = async (req: AuthRequest, res: Response) => {
       [isActive, userId]
     );
 
-    if (result.rows.length === 0) return res.status(404).json({ message: "User not found" });
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     try {
       await createNotification(
-        userId, 
-        "SYSTEM", 
-        "Account Status Updated", 
+        userId,
+        "SYSTEM",
+        "Account Status Updated",
         `Your account has been ${isActive ? 'activated' : 'deactivated'} by the administrator.`
       );
     } catch (err) {
       console.error("Notification failed", err);
     }
 
-    return res.status(200).json({ message: "User status updated", data: result.rows[0] });
+    return res.status(200).json({
+      message: "User status updated",
+      data: result.rows[0]
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -127,7 +138,7 @@ export const updateUserStatus = async (req: AuthRequest, res: Response) => {
 
 export const getAllProviders = async (req: AuthRequest, res: Response) => {
   try {
-    const status = req.query.status as string; // pending|verified|suspended
+    const status = req.query.status as string;
 
     let whereClause = "";
     if (status === 'pending') {
@@ -139,8 +150,9 @@ export const getAllProviders = async (req: AuthRequest, res: Response) => {
     }
 
     const query = `
-      SELECT pp.*, u.first_name, u.last_name, u.email, u.phone, u.is_active
-      FROM provider_profiles pp 
+      SELECT pp.*, u.first_name, u.last_name, 
+             u.email, u.phone, u.is_active
+      FROM provider_profiles pp
       JOIN users u ON pp.user_id = u.id
       ${whereClause}
       ORDER BY pp.created_at DESC
@@ -156,12 +168,15 @@ export const getAllProviders = async (req: AuthRequest, res: Response) => {
 
 export const verifyProvider = async (req: AuthRequest, res: Response) => {
   try {
-    const providerId = req.params.id;
+    // ✅ Fixed: added "as string"
+    const providerId = req.params.id as string;
 
     await pool.query("BEGIN");
-    
+
     const result = await pool.query(
-      `UPDATE provider_profiles SET is_verified = true, updated_at = NOW() WHERE id = $1 RETURNING *`,
+      `UPDATE provider_profiles 
+       SET is_verified = true, updated_at = NOW() 
+       WHERE id = $1 RETURNING *`,
       [providerId]
     );
 
@@ -170,23 +185,29 @@ export const verifyProvider = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Provider not found" });
     }
 
-    const userId = result.rows[0].user_id;
-    await pool.query(`UPDATE users SET is_active = true WHERE id = $1`, [userId]);
+    const userId = result.rows[0].user_id as string;
+    await pool.query(
+      `UPDATE users SET is_active = true WHERE id = $1`,
+      [userId]
+    );
 
     await pool.query("COMMIT");
 
     try {
       await createNotification(
-        userId, 
-        "SYSTEM", 
-        "Profile Verified", 
+        userId,
+        "SYSTEM",
+        "Profile Verified ✅",
         "Congratulations! Your provider profile has been verified and is now live."
       );
     } catch (err) {
       console.error("Notification failed", err);
     }
 
-    return res.status(200).json({ message: "Provider verified", data: result.rows[0] });
+    return res.status(200).json({
+      message: "Provider verified",
+      data: result.rows[0]
+    });
   } catch (error) {
     await pool.query("ROLLBACK");
     console.error(error);
@@ -196,12 +217,15 @@ export const verifyProvider = async (req: AuthRequest, res: Response) => {
 
 export const suspendProvider = async (req: AuthRequest, res: Response) => {
   try {
-    const providerId = req.params.id;
+    // ✅ Fixed: added "as string"
+    const providerId = req.params.id as string;
 
     await pool.query("BEGIN");
 
     const result = await pool.query(
-      `UPDATE provider_profiles SET is_verified = false, updated_at = NOW() WHERE id = $1 RETURNING *`,
+      `UPDATE provider_profiles 
+       SET is_verified = false, updated_at = NOW() 
+       WHERE id = $1 RETURNING *`,
       [providerId]
     );
 
@@ -210,23 +234,29 @@ export const suspendProvider = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Provider not found" });
     }
 
-    const userId = result.rows[0].user_id;
-    await pool.query(`UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1`, [userId]);
+    const userId = result.rows[0].user_id as string;
+    await pool.query(
+      `UPDATE users SET is_active = false, updated_at = NOW() WHERE id = $1`,
+      [userId]
+    );
 
     await pool.query("COMMIT");
 
     try {
       await createNotification(
-        userId, 
-        "SYSTEM", 
-        "Profile Suspended", 
+        userId,
+        "SYSTEM",
+        "Profile Suspended",
         "Your provider account has been suspended by the administrator."
       );
     } catch (err) {
       console.error("Notification failed", err);
     }
 
-    return res.status(200).json({ message: "Provider suspended", data: result.rows[0] });
+    return res.status(200).json({
+      message: "Provider suspended",
+      data: result.rows[0]
+    });
   } catch (error) {
     await pool.query("ROLLBACK");
     console.error(error);
@@ -240,7 +270,8 @@ export const getAllBookings = async (req: AuthRequest, res: Response) => {
     const status = req.query.status as string;
 
     let whereClause = "";
-    let values: any[] = [];
+    const values: any[] = [];
+
     if (status) {
       whereClause = "WHERE a.status = $1";
       values.push(status);
@@ -248,13 +279,18 @@ export const getAllBookings = async (req: AuthRequest, res: Response) => {
 
     const offset = (page - 1) * 20;
 
-    const countQuery = await pool.query(`SELECT COUNT(*) FROM appointments a ${whereClause}`, values);
+    const countQuery = await pool.query(
+      `SELECT COUNT(*) FROM appointments a ${whereClause}`,
+      values
+    );
     const totalCount = parseInt(countQuery.rows[0].count);
 
     const dataQuery = await pool.query(`
-      SELECT a.*, u.first_name, u.last_name, u.email,
-        s.name as service_name, pp.business_name,
-        ts.start_time, ts.end_time
+      SELECT a.*, 
+             u.first_name, u.last_name, u.email,
+             s.name as service_name, 
+             pp.business_name,
+             ts.start_time, ts.end_time
       FROM appointments a
       JOIN users u ON a.user_id = u.id
       JOIN services s ON a.service_id = s.id
@@ -287,7 +323,8 @@ export const getPlatformAnalytics = async (req: AuthRequest, res: Response) => {
         FROM appointments a
         JOIN time_slots ts ON a.time_slot_id = ts.id
         WHERE ts.start_time >= NOW() - INTERVAL '30 days'
-        GROUP BY DATE(ts.start_time) ORDER BY date ASC
+        GROUP BY DATE(ts.start_time)
+        ORDER BY date ASC
       `),
       pool.query(`
         SELECT pp.category, COUNT(*) as count
@@ -299,14 +336,20 @@ export const getPlatformAnalytics = async (req: AuthRequest, res: Response) => {
       pool.query(`
         SELECT TO_CHAR(created_at, 'Mon YYYY') as month,
                COUNT(*) as count
-        FROM users WHERE role = 'USER'
+        FROM users
+        WHERE role = 'USER'
         AND created_at >= NOW() - INTERVAL '6 months'
         GROUP BY month, DATE_TRUNC('month', created_at)
         ORDER BY DATE_TRUNC('month', created_at)
       `),
-      pool.query(`SELECT status, COUNT(*) as count FROM appointments GROUP BY status`),
       pool.query(`
-        SELECT pp.business_name, COUNT(*) as bookings,
+        SELECT status, COUNT(*) as count
+        FROM appointments
+        GROUP BY status
+      `),
+      pool.query(`
+        SELECT pp.business_name,
+               COUNT(*) as bookings,
                SUM(s.price) as revenue
         FROM appointments a
         JOIN time_slots ts ON a.time_slot_id = ts.id
@@ -314,7 +357,8 @@ export const getPlatformAnalytics = async (req: AuthRequest, res: Response) => {
         JOIN services s ON a.service_id = s.id
         WHERE a.status = 'COMPLETED'
         GROUP BY pp.business_name
-        ORDER BY bookings DESC LIMIT 10
+        ORDER BY bookings DESC
+        LIMIT 10
       `)
     ]);
 

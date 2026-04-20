@@ -59,12 +59,12 @@ export const Login = () => {
 
           {/* Top Logo */}
           <div className="flex items-center gap-3 relative z-10 mb-8 sm:mb-12">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-inner">
-              <span className="material-symbols-outlined text-white text-2xl">auto_awesome</span>
-            </div>
-            <h1 className="text-white text-xl font-extrabold tracking-tight">
-              SmartService <span className="opacity-70">DZ</span>
-            </h1>
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/ssd.png" alt="SmartService DZ" className="h-12 w-auto hover:opacity-90 transition-opacity" />
+              <h1 className="text-white text-2xl font-extrabold tracking-tight">
+                SmartService <span className="opacity-70">DZ</span>
+              </h1>
+            </Link>
           </div>
 
           <div className="relative z-10 flex-1 flex flex-col justify-center">

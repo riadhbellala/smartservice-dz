@@ -51,9 +51,12 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
         {/* TOP */}
         <div className="p-6 border-b border-slate-800">
           <div className="flex justify-between items-center lg:block">
-            <div>
-              <h1 className="text-2xl font-black text-white tracking-tight">SmartService DZ</h1>
-              <p className="text-slate-400 text-sm font-medium mt-1">Admin Panel</p>
+            <div className="flex flex-col items-start gap-1">
+              <div className="flex items-center gap-3">
+                <img src="/ssd.png" alt="SmartService DZ" className="h-10 w-auto" />
+                <h1 className="text-xl font-black text-white tracking-tight">SmartService DZ</h1>
+              </div>
+              <p className="text-slate-400 text-sm font-medium">Admin Panel</p>
             </div>
             <button 
               className="lg:hidden text-slate-400 hover:text-white"
